@@ -21,8 +21,12 @@
     bottom: 0px;
     left: 5px;
     right: 5px;
-    height: 25px;
-    line-break: 25px;
+    height: 10px;
+    line-break: 10px;
+}
+
+.anchor {
+    text-align: center;
 }
 
 img{

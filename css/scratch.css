@@ -1,0 +1,63 @@
+.common {
+    text-align: center;
+    font-family:'Times New Roman', Times, serif
+}
+
+.header {
+    background-color: black;
+    color: white;
+    height: 100px;
+    line-height: 100px;
+}
+
+.mainbody {
+    background-color: whitesmoke;
+}
+
+.footer {
+    position:fixed;
+    background-color: black;
+    color:white;
+    bottom: 0px;
+    left: 5px;
+    right: 5px;
+    height: 25px;
+    line-break: 25px;
+}
+
+img{
+    display: block;
+    width: 25%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+nav {
+    background-color: lightgray;
+    padding:10px;
+    overflow: hidden;
+}
+
+nav a {
+    color:#333;
+    text-decoration: none;
+    padding:20px;
+    font-weight: bold;
+}
+
+nav a:hover{
+    background-color: #ccc;
+}
+
+ol {
+    list-style-position: inside; /* Moves the number inside the <li> block */
+    padding-left: 0; /* Optional: removes default padding */
+    text-align: center; /* Centers the text and the number */
+}
+
+ul {
+    font-weight: bold;
+    list-style-position: inside; /* Moves the number inside the <li> block */
+    padding-left: 0; /* Optional: removes default padding */
+    text-align: center; /* Centers the text and the number */
+}

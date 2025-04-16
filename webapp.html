@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Race Track - 4 Lanes</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #e0ffe0;
+      padding: 20px;
+      overflow: hidden;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    .buttons {
+      margin: 20px 0;
+    }
+
+    .buttons button {
+      margin: 0 10px;
+      padding: 10px 15px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #trackWrapper {
+      width: 300px;
+      height: 300px;
+      margin: 50px auto 30px; /* Increased the margin to shift the track down */
+      position: relative;
+    }
+
+    #field {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: radial-gradient(circle, #228B22 90px, transparent 90px);
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+
+    #track {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      box-shadow: 0 0 0 8px #222,
+                  0 0 0 24px #333,
+                  0 0 0 40px #222,
+                  0 0 0 56px #333;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+
+    .racer {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      position: absolute;
+      margin: -9px 0 0 -9px;
+      z-index: 20;
+    }
+
+    #racer1 { background-color: red; }
+    #racer2 { background-color: blue; }
+    #racer3 { background-color: limegreen; }
+    #racer4 { background-color: orange; }
+
+    #lapBoard {
+      margin-top: 50px; /* Increased the margin to move the lap counter down */
+      font-size: 18px;
+    }
+
+    .lap {
+      margin: 5px 0;
+    }
+
+    #result {
+      font-size: 24px;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+
+    #playAgain, #returnToScratch {
+      display: none;
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    /* Ensure the 'Return to Scratch' button is styled and visible when needed */
+    #returnToScratch {
+      display: block;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Pick a Racer!</h1>
+
+  <div class="buttons">
+    <button onclick="startRace(1)">Red</button>
+    <button onclick="startRace(2)">Blue</button>
+    <button onclick="startRace(3)">Green</button>
+    <button onclick="startRace(4)">Orange</button>
+  </div>
+
+  <div id="trackWrapper">
+    <div id="field"></div>
+    <div id="track"></div>
+    <div id="racer1" class="racer"></div>
+    <div id="racer2" class="racer"></div>
+    <div id="racer3" class="racer"></div>
+    <div id="racer4" class="racer"></div>
+  </div>
+
+  <div id="lapBoard">
+    <div class="lap" id="lap1">Red: 0 laps</div>
+    <div class="lap" id="lap2">Blue: 0 laps</div>
+    <div class="lap" id="lap3">Green: 0 laps</div>
+    <div class="lap" id="lap4">Orange: 0 laps</div>
+  </div>
+
+  <div id="result"></div>
+  <button id="playAgain" onclick="resetRace()">Play Again</button>
+
+  <!-- Button to return to scratch.html -->
+  <button id="returnToScratch" onclick="goToScratch()">Go Home</button>
+
+  <script>
+    const racers = [
+      { id: 1, element: null, angle: 270, speed: 0, laps: 0, lapEl: null, laneOffset: 70 },
+      { id: 2, element: null, angle: 270, speed: 0, laps: 0, lapEl: null, laneOffset: 50 },
+      { id: 3, element: null, angle: 270, speed: 0, laps: 0, lapEl: null, laneOffset: 30 },
+      { id: 4, element: null, angle: 270, speed: 0, laps: 0, lapEl: null, laneOffset: 10 }
+    ];
+
+    let userPick = null;
+    let raceFinished = false;
+    let raceInterval = null;
+    const totalLaps = 3;
+
+    const wrapper = document.getElementById('trackWrapper');
+    const centerX = wrapper.offsetWidth / 2;
+    const centerY = wrapper.offsetHeight / 2;
+
+    function startRace(pick) {
+      userPick = pick;
+      document.querySelector('.buttons').style.display = 'none';
+
+      racers.forEach((racer) => {
+        racer.element = document.getElementById('racer' + racer.id);
+        racer.lapEl = document.getElementById('lap' + racer.id);
+        racer.angle = 270;
+        racer.speed = Math.random() * 1.5 + 1.5;
+        racer.laps = 0;
+      });
+
+      raceInterval = setInterval(() => {
+        racers.forEach(racer => {
+          racer.angle += racer.speed;
+          if (racer.angle >= 360) {
+            racer.angle -= 360;
+            checkLap(racer);
+          }
+
+          const rad = (racer.angle * Math.PI) / 180;
+          const radius = 120 + racer.laneOffset; // Calculate position with lane offset
+          const x = centerX + radius * Math.cos(rad);
+          const y = centerY + radius * Math.sin(rad);
+          racer.element.style.left = x + 'px';
+          racer.element.style.top = y + 'px';
+        });
+      }, 30);
+    }
+
+    function checkLap(racer) {
+      // Check if the racer is at the top of the track (0° or near it)
+      if (racer.angle >= 0 && racer.angle <= 5 && racer.laps < totalLaps) {
+        racer.laps++;
+        updateLapDisplay(racer);
+        if (racer.laps >= totalLaps && !raceFinished) {
+          finishRace(racer.id);
+        }
+      }
+    }
+
+    function updateLapDisplay(racer) {
+      const colors = ['Red', 'Blue', 'Green', 'Orange'];
+      racer.lapEl.textContent = `${colors[racer.id - 1]}: ${racer.laps} lap${racer.laps !== 1 ? 's' : ''}`;
+    }
+
+    function finishRace(winnerId) {
+      if (raceFinished) return;
+      raceFinished = true;
+      clearInterval(raceInterval);
+      const resultText = (winnerId === userPick) ? "🏁 You win!" : "😢 You lose!";
+      document.getElementById('result').textContent = resultText;
+      document.getElementById('playAgain').style.display = 'inline-block';
+      document.getElementById('returnToScratch').style.display = 'inline-block'; // Show the return button
+    }
+
+    function resetRace() {
+      raceFinished = false;
+      document.querySelector('.buttons').style.display = 'block';
+      document.getElementById('result').textContent = '';
+      document.getElementById('playAgain').style.display = 'none';
+      document.getElementById('returnToScratch').style.display = 'none'; // Hide return button after reset
+
+      racers.forEach(racer => {
+        racer.angle = 270;
+        racer.laps = 0;
+        const rad = (racer.angle * Math.PI) / 180;
+        const radius = 120 + racer.laneOffset;
+        const x = centerX + radius * Math.cos(rad);
+        const y = centerY + radius * Math.sin(rad);
+        racer.element = document.getElementById('racer' + racer.id);
+        racer.element.style.left = x + 'px';
+        racer.element.style.top = y + 'px';
+        updateLapDisplay(racer);
+      });
+    }
+
+    function goToScratch() {
+      window.location.href = 'scratch.html'; // Redirect to scratch.html
+    }
+
+    window.onload = resetRace;
+  </script>
+</body>
+</html>
